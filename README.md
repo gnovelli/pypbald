@@ -98,7 +98,7 @@ pypbald/
   - **`run.bat`**: Script for running the program.
 
 - **`schema/`**:
-  - **`pba.sql`**: SQL script to create the database structure used by the application.
+- **`pba.sql`**: [SQL script to create the database structure used by the application](DATA_MODEL.md).
 
 ## Configuration
 
