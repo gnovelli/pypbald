@@ -1,14 +1,9 @@
+# Disclaimer
 
-## ⚠️ **Disclaimer**
+This software is provided "as is," without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement. 
 
-Questo sistema di trading algoritmico è sviluppato **esclusivamente per finalità didattiche e di apprendimento** nell'ambito del **Reinforcement Learning**. Il sistema **non esegue operazioni di trading reali**, ma **simula decisioni di trading** basate su un algoritmo di Reinforcement Learning.
+In no event shall the authors, contributors, or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.
 
-Il codice fornisce una soluzione di base per comprendere le dinamiche dei sistemi di trading algoritmico e può servire come punto di partenza per sviluppi futuri.
+You are solely responsible for determining the appropriateness of using or redistributing the software and assume any risks associated with your exercise of permissions under the license.
 
-### ❗ **Avvertenze**
-
-- Questo sistema è una simulazione e **non interagisce con piattaforme di trading reali**.
-- Le decisioni prese dal sistema sono il risultato di un algoritmo di Reinforcement Learning e non rappresentano consigli o strategie di investimento reali.
-- Gli sviluppatori e i contributori del progetto **non si assumono alcuna responsabilità** per l'utilizzo improprio del codice.
-
-**Si consiglia di utilizzare questo sistema solo per scopi di studio e ricerca.**
+The authors and contributors provide no guarantee of the software's functionality, reliability, or performance and accept no liability for any issues that may arise from its use.
