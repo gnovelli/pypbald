@@ -38,8 +38,15 @@ class PBALogger(PBASingleton):
 
             Initializes logging module and files
         '''
+        import os
         self._pba = pba
         self.LOG_FILENAME = self._pba.cfg('log_filename');
+        
+        # Ensure the log directory exists
+        log_dir = os.path.dirname(self.LOG_FILENAME)
+        if log_dir and not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        
         # Set up a specific logger with our desired output level
         self.my_logger = logging.getLogger('MyLogger')
         self.my_logger.setLevel(logging.DEBUG)
