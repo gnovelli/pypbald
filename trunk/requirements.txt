@@ -1,0 +1,4 @@
+dpkt>=1.9.0
+mysql-connector-python>=8.0.0
+pyinstaller>=4.0
+pypcap>=1.2.3

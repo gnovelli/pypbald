@@ -5,6 +5,8 @@ package-lock.json
 # Python
 __pycache__/
 *.pyc
+*.pyo
 
-# Log
+# Logs and virtual environment directories
 trunk/logs/
+trunk/venv/

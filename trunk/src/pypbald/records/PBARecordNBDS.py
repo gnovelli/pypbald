@@ -114,7 +114,7 @@ class PBARecordNBDS(PBARecord):
                                      self._src_netbios_name_encoded,
                                      self._dst_netbios_name_encoded
                                     )
-        if backend.getsummarynbds().has_key(hash_value):
+        if hash_value in backend.getsummarynbds():
             backend.execute("""
                    UPDATE pba_nbds_summary
                    SET count = count +1, last_seen = """ + last_seen + """
