@@ -1,13 +1,12 @@
 # Base image
-FROM python:2.7-slim
+FROM python:3.11-slim
 
 # Install dependencies
-RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
-    sed -i 's|security.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
-    sed -i '/buster-updates/d' /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get install -y --allow-unauthenticated build-essential default-libmysqlclient-dev libpcap-dev && \
-    pip install mysqlclient dpkt pypcap
+RUN apt-get update && \
+    apt-get install -y build-essential default-libmysqlclient-dev libpcap-dev && \
+    pip install mysql-connector-python dpkt pypcap && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /usr/src/app/src
@@ -19,4 +18,4 @@ COPY . /usr/src/app/
 RUN mkdir -p /usr/src/app/logs
 
 # Command to run the application
-CMD ["python", "main.py"]
+CMD ["python3", "main.py"]
