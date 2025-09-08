@@ -68,6 +68,7 @@ class PBA(PBASingleton):
         self._cfg['log_filename'] = config.get('global','log_filename')
 
         self._cfg['localdb_enabled'] = True
+        self._cfg['localdb_hostname'] = config.get('localdb','hostname')
         self._cfg['localdb_username'] = config.get('localdb','username')
         self._cfg['localdb_password'] = config.get('localdb','password')
         self._cfg['localdb_database'] = config.get('localdb','database')

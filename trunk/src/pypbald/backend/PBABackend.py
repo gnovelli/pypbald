@@ -64,7 +64,7 @@ class PBABackend(PBASingleton):
         self._pba = pba
         if (self._pba.cfg('localdb_enabled')):
             self._localdb_conn = MySQLdb.connect(
-                host = "localhost",
+                host = self._pba.cfg('localdb_hostname'),
                 user = self._pba.cfg('localdb_username'),
                 passwd = self._pba.cfg('localdb_password'),
                 db = self._pba.cfg('localdb_database'),

@@ -1,0 +1,40 @@
+version: '3.7'
+
+services:
+  db:
+    image: mysql:5.7
+    container_name: pypbald-db
+    environment:
+      MYSQL_DATABASE: pba
+      MYSQL_USER: pba
+      MYSQL_PASSWORD: pba
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./trunk/schema/pba.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pypbald-net
+
+  app:
+    build:
+      context: ./trunk
+    container_name: pypbald-app
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./trunk:/usr/src/app
+    networks:
+      - pypbald-net
+
+networks:
+  pypbald-net:
+    driver: bridge
+
+volumes:
+  db_data:

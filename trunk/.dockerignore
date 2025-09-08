@@ -1,0 +1,9 @@
+Dockerfile
+.dockerignore
+nbproject/
+__pycache__/
+*.pyc
+logs/
+dist/
+build/
+*.log
