@@ -84,12 +84,19 @@ class PBABackend(PBASingleton):
         '''
             Tables reset
         '''
-        self.execute('TRUNCATE TABLE pba_nbds')
-        self.execute('TRUNCATE TABLE pba_nbds_summary')
-        self.execute('TRUNCATE TABLE pba_nbds_raw')
-        self.execute('TRUNCATE TABLE pba_arp')
-        self.execute('TRUNCATE TABLE pba_arp_summary')
-        self.execute('TRUNCATE TABLE pba_arp_raw')
+        self.execute_local('TRUNCATE TABLE pba_nbds')
+        self.execute_local('TRUNCATE TABLE pba_nbds_summary')
+        self.execute_local('TRUNCATE TABLE pba_nbds_raw')
+        self.execute_local('TRUNCATE TABLE pba_arp')
+        self.execute_local('TRUNCATE TABLE pba_arp_summary')
+        self.execute_local('TRUNCATE TABLE pba_arp_raw')
+        
+        self.execute_remote('TRUNCATE TABLE pba_nbds')
+        self.execute_remote('TRUNCATE TABLE pba_nbds_summary')
+        self.execute_remote('TRUNCATE TABLE pba_nbds_raw')
+        self.execute_remote('TRUNCATE TABLE pba_arp')
+        self.execute_remote('TRUNCATE TABLE pba_arp_summary')
+        self.execute_remote('TRUNCATE TABLE pba_arp_raw')
 
     def execute(self, conn, stmt):
         '''
@@ -149,19 +156,20 @@ class PBABackend(PBASingleton):
             Initializes NBDS summary dictionary
         '''
         tempdict = {}
-        stmt = "select * from pba_nbds_summary"
-        rows = self.query(self._localdb_conn, stmt)
-        for row in rows:
-            hash_value = self.make_hash_nbds(
-                row['src_mac'],
-                row['src_ip'],
-                row['dst_ip'],
-                row['src_netbios_name_encoded'],
-                row['dst_netbios_name_encoded'])
-            if hash_value not in tempdict:
-                tempdict[hash_value]=row
-            if (self._pba.cfg('debug')):
-                print(hash_value, row)
+        if self._localdb_conn is not None:
+            stmt = "select * from pba_nbds_summary"
+            rows = self.query(self._localdb_conn, stmt)
+            for row in rows:
+                hash_value = self.make_hash_nbds(
+                    row['src_mac'],
+                    row['src_ip'],
+                    row['dst_ip'],
+                    row['src_netbios_name_encoded'],
+                    row['dst_netbios_name_encoded'])
+                if hash_value not in tempdict:
+                    tempdict[hash_value]=row
+                if (self._pba.cfg('debug')):
+                    print(hash_value, row)
         self._summary_nbds = tempdict
         self._pba._summary_nbds = self._summary_nbds
         return tempdict
@@ -172,16 +180,17 @@ class PBABackend(PBASingleton):
 
         '''
         tempdict = {}
-        stmt = "select * from pba_arp_summary"
-        rows = self.query(self._localdb_conn, stmt)
-        for row in rows:
-            hash_value = self.make_hash_arp(
-                row['src_mac'],
-                row['src_ip'])
-            if hash_value not in tempdict:
-                tempdict[hash_value]=row
-            if (self._pba.cfg('debug')):
-                print(hash_value, row)
+        if self._localdb_conn is not None:
+            stmt = "select * from pba_arp_summary"
+            rows = self.query(self._localdb_conn, stmt)
+            for row in rows:
+                hash_value = self.make_hash_arp(
+                    row['src_mac'],
+                    row['src_ip'])
+                if hash_value not in tempdict:
+                    tempdict[hash_value]=row
+                if (self._pba.cfg('debug')):
+                    print(hash_value, row)
         self._summary_arp = tempdict
         self._pba._summary_arp = self._summary_arp
         return tempdict

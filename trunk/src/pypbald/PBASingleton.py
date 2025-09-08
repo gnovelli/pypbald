@@ -37,5 +37,5 @@ class PBASingleton:
             is realized the principle of the Singleton Pattern.
         '''
         if '__instance' not in vars(cls):
-            cls.__instance = cls.__new__(cls, *args, **kwargs)
+            cls.__instance = super(PBASingleton, cls).__new__(cls)
         return cls.__instance

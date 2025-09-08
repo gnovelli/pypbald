@@ -1,0 +1,8 @@
+# Exclude logs and virtual environment directories
+trunk/logs/
+trunk/venv/
+
+# Exclude Python cache directories
+__pycache__/
+*.pyc
+*.pyo
