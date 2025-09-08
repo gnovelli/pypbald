@@ -72,7 +72,7 @@ class PBARecordARPRequest(PBARecord):
         last_seen = datetime.now().strftime("%Y%m%d%H%M%S")
         hash_value = backend.make_hash_arp(self._src_mac,
                                      self._src_ip)
-        if backend.getsummaryarp().has_key(hash_value):
+        if hash_value in backend.getsummaryarp():
             backend.execute("""
                    UPDATE pba_arp_summary
                    SET count = count +1, last_seen = """ + last_seen + """

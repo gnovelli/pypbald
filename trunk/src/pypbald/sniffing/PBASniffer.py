@@ -63,13 +63,13 @@ class PBASniffer(PBASingleton):
             CTRL+C is needed to stop listening
         '''
         try:
-            print 'listening on %s: %s' % (self._pc.name, self._pc.filter)
+            print('listening on %s: %s' % (self._pc.name, self._pc.filter))
             for timestamp, packet in self._pc:
                 record = parser.parse(packet, timestamp)
                 if isinstance(record,PBARecordNBDS):
                     text = record.gettext()
                     if (self._pba.cfg('debug')):
-                        print text
+                        print(text)
                     logger.log(text)
                     if record.isaname():
                         record.insert(backend)
@@ -77,13 +77,13 @@ class PBASniffer(PBASingleton):
                 if isinstance(record,PBARecordARPRequest):
                     text = record.gettext()
                     if (self._pba.cfg('debug')):
-                        print text
+                        print(text)
                     logger.log(text)
                     record.insert(backend)
                     record.update(backend)
 
         except KeyboardInterrupt:
             nrecv, ndrop, nifdrop = self._pc.stats()
-            print '\n%d received packets' % nrecv
-            print '%d kernel dropped packets' % ndrop
-            print '%d nifdrop' % nifdrop
+            print('\n%d received packets' % nrecv)
+            print('%d kernel dropped packets' % ndrop)
+            print('%d nifdrop' % nifdrop)

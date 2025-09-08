@@ -17,7 +17,7 @@
 __author__ = "Giovanni Novelli"
 __date__ = "02/05/2010"
 
-import ConfigParser
+import configparser
 from pypbald.PBASingleton import PBASingleton
 from pypbald.backend.PBABackend import PBABackend
 from pypbald.logging.PBALogger import PBALogger
@@ -60,7 +60,7 @@ class PBA(PBASingleton):
         '''
         self._cfg = {'Application': 'pypbald'}
 
-        config = ConfigParser.RawConfigParser()
+        config = configparser.RawConfigParser()
         config.read('../pypbald.config')
 
         self._cfg['debug'] = config.getboolean('global','debug')

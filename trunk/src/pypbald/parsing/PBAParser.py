@@ -78,14 +78,14 @@ class PBAParser(PBASingleton):
         sdnbname = udp_packet.data[dnn1:dnn2]
         hdnbname = hexlify(udp_packet.data[dnn1:dnn2])
         if (self._pba.cfg('debug')):
-            print hexlify(udp_packet.data)
-            print hexlify(udp_packet.data[0:14])
-            print hexlify(udp_packet.data[snn1:snn2])
-            print hexlify(udp_packet.data[dnn1:dnn2])
-            print nbname
-            print dnbname
-            print snbname
-            print sdnbname
+            print(hexlify(udp_packet.data))
+            print(hexlify(udp_packet.data[0:14]))
+            print(hexlify(udp_packet.data[snn1:snn2]))
+            print(hexlify(udp_packet.data[dnn1:dnn2]))
+            print(nbname)
+            print(dnbname)
+            print(snbname)
+            print(sdnbname)
 
         record = PBARecordNBDS(raw_packet, timestamp)
         record.assign(thetime,
@@ -117,9 +117,9 @@ class PBAParser(PBASingleton):
         dst_ip = '.'.join(str(int(i, 16)) for i in ([dst_ip_encoded[i:i+2]
                     for i in range(0, len(dst_ip_encoded), 2)]))
         if (self._pba.cfg('debug')):
-            print src_mac
-            print src_ip
-            print dst_ip
+            print(src_mac)
+            print(src_ip)
+            print(dst_ip)
 
         record = PBARecordARPRequest(raw_packet, timestamp)
         record.assign(thetime,
@@ -142,7 +142,7 @@ class PBAParser(PBASingleton):
         ethernet_frame = Ethernet(raw_packet)
         ethernet_data = ethernet_frame.data
         udp_packet = ethernet_data.data
-        print ethernet_frame.__dict__
+        print(ethernet_frame.__dict__)
         if ('arp' in ethernet_frame.__dict__):
             record = self.extract_arp(packet, timestamp)
         else:

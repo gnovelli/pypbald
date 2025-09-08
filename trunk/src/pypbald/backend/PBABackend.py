@@ -15,8 +15,8 @@ __date__ = "02/05/2010"
 
 from binascii import hexlify
 import hashlib
-import MySQLdb
-import MySQLdb.cursors
+import mysql.connector
+from mysql.connector import Error
 from pypbald.PBASingleton import PBASingleton
 
 class PBABackend(PBASingleton):
@@ -63,20 +63,18 @@ class PBABackend(PBASingleton):
         '''
         self._pba = pba
         if (self._pba.cfg('localdb_enabled')):
-            self._localdb_conn = MySQLdb.connect(
+            self._localdb_conn = mysql.connector.connect(
                 host = "localhost",
                 user = self._pba.cfg('localdb_username'),
-                passwd = self._pba.cfg('localdb_password'),
-                db = self._pba.cfg('localdb_database'),
-                cursorclass=MySQLdb.cursors.DictCursor)
+                password = self._pba.cfg('localdb_password'),
+                database = self._pba.cfg('localdb_database'))
 
         if (self._pba.cfg('remotedb_enabled')):
-            self._remotedb_conn = MySQLdb.connect(
+            self._remotedb_conn = mysql.connector.connect(
                 host = self._pba.cfg('remotedb_hostname'),
                 user = self._pba.cfg('remotedb_username'),
-                passwd = self._pba.cfg('remotedb_password'),
-                db = self._pba.cfg('remotedb_database'),
-                cursorclass=MySQLdb.cursors.DictCursor)
+                password = self._pba.cfg('remotedb_password'),
+                database = self._pba.cfg('remotedb_database'))
         if (self._pba.cfg('debug')):
             self.reset()
         self.summary_nbds()
@@ -97,7 +95,7 @@ class PBABackend(PBASingleton):
         '''
             Database connection
         '''
-        cursor = conn.cursor ()
+        cursor = conn.cursor(dictionary=True)
         cursor.execute (stmt)
         cursor.close()
         conn.commit()
@@ -109,7 +107,7 @@ class PBABackend(PBASingleton):
         '''
         if (self._pba.cfg('localdb_enabled')):
             conn = self._localdb_conn
-            cursor = conn.cursor ()
+            cursor = conn.cursor(dictionary=True)
             cursor.execute (stmt)
             cursor.close()
             conn.commit()
@@ -121,7 +119,7 @@ class PBABackend(PBASingleton):
         '''
         if (self._pba.cfg('remotedb_enabled')):
             conn = self._remotedb_conn
-            cursor = conn.cursor ()
+            cursor = conn.cursor(dictionary=True)
             cursor.execute (stmt)
             cursor.close()
             conn.commit()
@@ -140,7 +138,7 @@ class PBABackend(PBASingleton):
 
             Returns fetched rows
         '''
-        cursor = conn.cursor ()
+        cursor = conn.cursor(dictionary=True)
         cursor.execute (stmt)
         rows = cursor.fetchall()
         cursor.close()
@@ -160,10 +158,10 @@ class PBABackend(PBASingleton):
                 row['dst_ip'],
                 row['src_netbios_name_encoded'],
                 row['dst_netbios_name_encoded'])
-            if (not tempdict.has_key(hash_value)):
+            if hash_value not in tempdict:
                 tempdict[hash_value]=row
             if (self._pba.cfg('debug')):
-                print hash_value,row
+                print(hash_value, row)
         self._summary_nbds = tempdict
         self._pba._summary_nbds = self._summary_nbds
         return tempdict
@@ -180,10 +178,10 @@ class PBABackend(PBASingleton):
             hash_value = self.make_hash_arp(
                 row['src_mac'],
                 row['src_ip'])
-            if (not tempdict.has_key(hash_value)):
+            if hash_value not in tempdict:
                 tempdict[hash_value]=row
             if (self._pba.cfg('debug')):
-                print hash_value,row
+                print(hash_value, row)
         self._summary_arp = tempdict
         self._pba._summary_arp = self._summary_arp
         return tempdict
@@ -230,7 +228,7 @@ class PBABackend(PBASingleton):
         str = str + src_netbios_name_encoded
         str = str + dst_netbios_name_encoded
         hash = hashlib.md5()
-        hash.update(str)
+        hash.update(str.encode('utf-8'))
         hash_value = hexlify(hash.digest())
         return hash_value
 
@@ -254,7 +252,7 @@ class PBABackend(PBASingleton):
         str = str + src_mac
         str = str + src_ip
         hash = hashlib.md5()
-        hash.update(str)
+        hash.update(str.encode('utf-8'))
         hash_value = hexlify(hash.digest())
         return hash_value
 
