@@ -61,7 +61,9 @@ class PBA(PBASingleton):
         self._cfg = {'Application': 'pypbald'}
 
         config = configparser.RawConfigParser()
-        config.read('../pypbald.config')
+        import os
+        config_path = os.path.join(os.path.dirname(__file__), '../pypbald.config')
+        config.read(config_path)
 
         self._cfg['debug'] = config.getboolean('global','debug')
         self._cfg['filter'] = config.get('global','filter')
