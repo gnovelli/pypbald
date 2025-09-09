@@ -82,7 +82,7 @@ class PBASniffer(PBASingleton):
         try:
             print(f'listening on {iface}: {sniffer.filter}')
             for timestamp, packet in sniffer:
-                record = parser.parse(packet, timestamp)
+                record = parser.parse(packet, timestamp, iface)
                 if isinstance(record, PBARecordNBDS):
                     text = f"[{iface}] {record.gettext()}"
                     if self._pba.cfg('debug'):

@@ -78,29 +78,36 @@ class PBARecordARPRequest(PBARecord):
                    SET count = count +1, last_seen = """ + last_seen + """
                    WHERE src_mac = '""" + self._src_mac + """' 
                          AND
-                         src_ip = '""" + self._src_ip + """'""")
+                         src_ip = '""" + self._src_ip + """'
+                         AND
+                         interface_name = '""" + self._interface_name + """'""")
         else:
             backend.execute("""
                    INSERT INTO pba_arp_summary (
                     src_mac,
                     src_ip,
+                    interface_name,
                     first_seen)
                    VALUES
                     (
                         '"""+self._src_mac+"""',
                         '"""+self._src_ip+"""',
+                        '"""+self._interface_name+"""',
                         """+last_seen+""")
                     """)
                      
         stmt = """  select DISTINCT
                         src_mac,
-                        src_ip
+                        src_ip,
+                        interface_name
                     from
                         pba_arp_summary
                     WHERE
                         src_mac = '""" + self._src_mac + """'
                     AND
-                        src_ip = '""" + self._src_ip + """'"""
+                        src_ip = '""" + self._src_ip + """'
+                    AND
+                        interface_name = '""" + self._interface_name + """'"""
 
         rows = backend.query(backend._localdb_conn, stmt)
         for row in rows:
@@ -126,12 +133,14 @@ class PBARecordARPRequest(PBARecord):
                    INSERT INTO pba_arp (hash,
                                          thetime,
                                          src_mac,
-                                         src_ip)
+                                         src_ip,
+                                         interface_name)
                    VALUES
                      ('"""+hash_value+"""',
                       '"""+self._thetime+"""',
                       '"""+self._src_mac+"""',
-                      '"""+self._src_ip+"""')
+                      '"""+self._src_ip+"""',
+                      '"""+self._interface_name+"""')
                      """
         if (backend.getpba().cfg('localdb_detail')):
             backend.execute_local(stmt)
@@ -140,9 +149,12 @@ class PBARecordARPRequest(PBARecord):
 
         raw = hexlify(self._pkt).decode('ascii')
         stmt = """
-                   INSERT INTO pba_arp_raw (hash,raw)
+                   INSERT INTO pba_arp_raw (hash,
+                                            interface_name,
+                                            raw)
                    VALUES
                      ('"""+hash_value+"""',
+                      '"""+self._interface_name+"""',
                       '"""+raw+"""')
                      """
         if (backend.getpba().cfg('localdb_raw')):

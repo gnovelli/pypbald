@@ -22,9 +22,11 @@ class PBARecord:
     '''
     _pkt = None
     _ts = None
-    def __init__(self, packet, timestamp):
+    _interface_name = None
+    def __init__(self, packet, timestamp, interface_name=None):
         '''
             PBARecord constructor
         '''
         self._pkt = packet
         self._ts = timestamp
+        self._interface_name = interface_name or ''

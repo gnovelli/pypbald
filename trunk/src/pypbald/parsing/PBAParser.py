@@ -46,7 +46,7 @@ class PBAParser(PBASingleton):
         '''
         self._pba = pba
 
-    def extract_nbds(self, packet, timestamp):
+    def extract_nbds(self, packet, timestamp, interface_name=None):
         '''
             Extracts NBDS record from a packet
         '''
@@ -87,7 +87,7 @@ class PBAParser(PBASingleton):
             print(snbname)
             print(sdnbname)
 
-        record = PBARecordNBDS(raw_packet, timestamp)
+        record = PBARecordNBDS(raw_packet, timestamp, interface_name)
         record.assign(thetime,
                       src_mac,
                       srcip,
@@ -101,7 +101,7 @@ class PBAParser(PBASingleton):
         return record
 
 
-    def extract_arp(self, packet, timestamp):
+    def extract_arp(self, packet, timestamp, interface_name=None):
         '''
             Extracts an ARP record from a packet
         '''
@@ -121,13 +121,13 @@ class PBAParser(PBASingleton):
             print(src_ip)
             print(dst_ip)
 
-        record = PBARecordARPRequest(raw_packet, timestamp)
+        record = PBARecordARPRequest(raw_packet, timestamp, interface_name)
         record.assign(thetime,
                       src_mac,
                       src_ip)
         return record
 
-    def parse(self, packet, timestamp):
+    def parse(self, packet, timestamp, interface_name=None):
         '''
             It parses filtered broadcast packets and encapsulates them in well formed
             records
@@ -144,10 +144,10 @@ class PBAParser(PBASingleton):
         udp_packet = ethernet_data.data
         print(ethernet_frame.__dict__)
         if ('arp' in ethernet_frame.__dict__):
-            record = self.extract_arp(packet, timestamp)
+            record = self.extract_arp(packet, timestamp, interface_name)
         else:
             dst_mac = hexlify(ethernet_frame['dst']).decode('ascii')
             if (udp_packet['sport']==138):
                 if dst_mac == 'ffffffffffff':
-                    record = self.extract_nbds(packet, timestamp)
+                    record = self.extract_nbds(packet, timestamp, interface_name)
         return record

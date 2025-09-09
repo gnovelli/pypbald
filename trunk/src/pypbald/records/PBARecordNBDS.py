@@ -122,6 +122,8 @@ class PBARecordNBDS(PBARecord):
                          AND
                          src_ip = '""" + self._src_ip + """'
                          AND
+                         interface_name = '""" + self._interface_name + """'
+                         AND
                          dst_ip = '""" + self._dst_ip + """'
                          AND
                          src_netbios_name_encoded = '""" +
@@ -134,6 +136,7 @@ class PBARecordNBDS(PBARecord):
                    INSERT INTO pba_nbds_summary (
                     src_mac,
                     src_ip,
+                    interface_name,
                     dst_ip,
                     src_netbios_name,
                     src_netbios_name_encoded,
@@ -144,6 +147,7 @@ class PBARecordNBDS(PBARecord):
                     (
                         '"""+self._src_mac+"""',
                         '"""+self._src_ip+"""',
+                        '"""+self._interface_name+"""',
                         '"""+self._dst_ip+"""',
                         '"""+self._src_netbios_name+"""',
                         '"""+self._src_netbios_name_encoded+"""',
@@ -155,6 +159,7 @@ class PBARecordNBDS(PBARecord):
         stmt = """  select DISTINCT
                         src_mac,
                         src_ip,
+                        interface_name,
                         dst_ip,
                         src_netbios_name_encoded,
                         dst_netbios_name_encoded
@@ -164,6 +169,8 @@ class PBARecordNBDS(PBARecord):
                         src_mac = '""" + self._src_mac + """'
                     AND
                         src_ip = '""" + self._src_ip + """'
+                    AND
+                        interface_name = '""" + self._interface_name + """'
                     AND
                         dst_ip = '""" + self._dst_ip + """'
                     AND
@@ -206,6 +213,7 @@ class PBARecordNBDS(PBARecord):
                                          thetime,
                                          src_mac,
                                          src_ip,
+                                         interface_name,
                                          dst_ip,
                                          src_netbios_name,
                                          src_netbios_name_hex,
@@ -218,6 +226,7 @@ class PBARecordNBDS(PBARecord):
                       '"""+self._thetime+"""',
                       '"""+self._src_mac+"""',
                       '"""+self._src_ip+"""',
+                      '"""+self._interface_name+"""',
                       '"""+self._dst_ip+"""',
                       '"""+self._src_netbios_name+"""',
                       '"""+self._src_netbios_name_hex+"""',
@@ -233,9 +242,12 @@ class PBARecordNBDS(PBARecord):
 
         raw = hexlify(self._pkt).decode('ascii')
         stmt = """
-                   INSERT INTO pba_nbds_raw (hash,raw)
+                   INSERT INTO pba_nbds_raw (hash,
+                                             interface_name,
+                                             raw)
                    VALUES
                      ('"""+hash_value+"""',
+                      '"""+self._interface_name+"""',
                       '"""+raw+"""')
                      """
         if (backend.getpba().cfg('localdb_raw')):
