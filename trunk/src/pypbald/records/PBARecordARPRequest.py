@@ -138,7 +138,7 @@ class PBARecordARPRequest(PBARecord):
         if (backend.getpba().cfg('remotedb_detail')):
             backend.execute_remote(stmt)
 
-        raw = hexlify(self._pkt)
+        raw = hexlify(self._pkt).decode('ascii')
         stmt = """
                    INSERT INTO pba_arp_raw (hash,raw)
                    VALUES

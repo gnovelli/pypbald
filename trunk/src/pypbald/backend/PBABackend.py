@@ -238,7 +238,7 @@ class PBABackend(PBASingleton):
         str = str + dst_netbios_name_encoded
         hash = hashlib.md5()
         hash.update(str.encode('utf-8'))
-        hash_value = hexlify(hash.digest())
+        hash_value = hexlify(hash.digest()).decode('ascii')
         return hash_value
 
     def make_hash_arp(self,
@@ -258,11 +258,16 @@ class PBABackend(PBASingleton):
             Returns an hexadecimal encoding of such a digest
         '''
         str = ""
+        # Handle bytes objects from hexlify() in Python 3
+        if isinstance(src_mac, bytes):
+            src_mac = src_mac.decode('utf-8')
+        if isinstance(src_ip, bytes):
+            src_ip = src_ip.decode('utf-8')
         str = str + src_mac
         str = str + src_ip
         hash = hashlib.md5()
         hash.update(str.encode('utf-8'))
-        hash_value = hexlify(hash.digest())
+        hash_value = hexlify(hash.digest()).decode('ascii')
         return hash_value
 
     def getpba(self):
