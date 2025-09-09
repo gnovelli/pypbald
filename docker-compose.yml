@@ -24,13 +24,12 @@ services:
     build:
       context: ./trunk
     container_name: pypbald-app
+    network_mode: "host"
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - ./trunk:/usr/src/app
-    networks:
-      - pypbald-net
 
 networks:
   pypbald-net:

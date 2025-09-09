@@ -19,6 +19,8 @@ __author__ = "Giovanni Novelli"
 __date__ = "02/05/2010"
 
 import pcap
+import netifaces
+import threading
 from pypbald.PBASingleton import PBASingleton
 from pypbald.records.PBARecordNBDS import PBARecordNBDS
 from pypbald.records.PBARecordARPRequest import PBARecordARPRequest
@@ -39,51 +41,107 @@ class PBASniffer(PBASingleton):
         This class is implemented as a Singleton Pattern
     '''
     _pba = None
-    _pc = None
+    _sniffers = {}
+    _threads = []
 
     def __init__(self, pba):
         '''
             PBASniffer constructor
 
-            Initializes pcap filter according to pypbald configuration
+            Initializes pcap filters for all available network interfaces
         '''
         self._pba = pba
-        name = "eth0"
-        self._pc = pcap.pcap(name)
-        self._pc.setfilter(self._pba.cfg('filter'))
+        self._sniffers = {}
+        self._threads = []
+        
+        # Get all network interfaces
+        interfaces = netifaces.interfaces()
+        print(f"Available interfaces: {interfaces}")
+        
+        for iface in interfaces:
+            # Skip loopback interface
+            if iface == 'lo':
+                continue
+                
+            try:
+                # Initialize pcap for this interface
+                sniffer = pcap.pcap(iface)
+                sniffer.setfilter(self._pba.cfg('filter'))
+                self._sniffers[iface] = sniffer
+                print(f"Initialized sniffer for interface: {iface}")
+            except Exception as e:
+                print(f"Warning: Could not initialize sniffing on {iface}: {e}")
+        
+        if not self._sniffers:
+            print("Warning: No network interfaces available for sniffing")
 
-    def listen(self, backend, logger, parser):
+    def _sniff_interface(self, iface, sniffer, backend, logger, parser):
         '''
-            Listening loop
-
-            Allows raw console debugging according to pypbald configuration
-
-            When NBDS destination is NOT __MSBROWSE__ backend is updated
-
-            CTRL+C is needed to stop listening
+            Sniffing function for a single interface (runs in separate thread)
         '''
         try:
-            print('listening on %s: %s' % (self._pc.name, self._pc.filter))
-            for timestamp, packet in self._pc:
+            print(f'listening on {iface}: {sniffer.filter}')
+            for timestamp, packet in sniffer:
                 record = parser.parse(packet, timestamp)
-                if isinstance(record,PBARecordNBDS):
-                    text = record.gettext()
-                    if (self._pba.cfg('debug')):
+                if isinstance(record, PBARecordNBDS):
+                    text = f"[{iface}] {record.gettext()}"
+                    if self._pba.cfg('debug'):
                         print(text)
                     logger.log(text)
                     if record.isaname():
                         record.insert(backend)
                         record.update(backend)
-                if isinstance(record,PBARecordARPRequest):
-                    text = record.gettext()
-                    if (self._pba.cfg('debug')):
+                if isinstance(record, PBARecordARPRequest):
+                    text = f"[{iface}] {record.gettext()}"
+                    if self._pba.cfg('debug'):
                         print(text)
                     logger.log(text)
                     record.insert(backend)
                     record.update(backend)
-
+                    
         except KeyboardInterrupt:
-            nrecv, ndrop, nifdrop = self._pc.stats()
-            print('\n%d received packets' % nrecv)
-            print('%d kernel dropped packets' % ndrop)
-            print('%d nifdrop' % nifdrop)
+            pass  # Handle graceful shutdown
+        except Exception as e:
+            print(f"Error on interface {iface}: {e}")
+        finally:
+            try:
+                nrecv, ndrop, nifdrop = sniffer.stats()
+                print(f'\nInterface {iface} statistics:')
+                print(f'  {nrecv} received packets')
+                print(f'  {ndrop} kernel dropped packets') 
+                print(f'  {nifdrop} interface dropped packets')
+            except:
+                print(f'Could not retrieve statistics for {iface}')
+
+    def listen(self, backend, logger, parser):
+        '''
+            Multi-interface listening loop
+
+            Starts a separate thread for each network interface.
+            
+            CTRL+C is needed to stop listening
+        '''
+        if not self._sniffers:
+            print("No interfaces available for sniffing")
+            return
+            
+        print(f"Starting sniffing on {len(self._sniffers)} interfaces...")
+        
+        # Start a thread for each interface
+        for iface, sniffer in self._sniffers.items():
+            thread = threading.Thread(
+                target=self._sniff_interface,
+                args=(iface, sniffer, backend, logger, parser),
+                name=f"sniffer-{iface}"
+            )
+            thread.daemon = True
+            thread.start()
+            self._threads.append(thread)
+        
+        try:
+            # Wait for all threads to complete
+            for thread in self._threads:
+                thread.join()
+        except KeyboardInterrupt:
+            print("\nShutdown requested, stopping all sniffers...")
+            # Threads will naturally terminate when main thread exits

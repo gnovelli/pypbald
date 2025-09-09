@@ -4,7 +4,7 @@ FROM python:3.11-slim
 # Install dependencies
 RUN apt-get update && \
     apt-get install -y build-essential default-libmysqlclient-dev libpcap-dev && \
-    pip install mysql-connector-python dpkt pypcap && \
+    pip install mysql-connector-python dpkt pypcap netifaces && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
